@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>顺德4天美食攻略 | 本地人路线</title>
+<style>
+  :root {
+    --primary: #d4380d;
+    --primary-light: #fff1e6;
+    --accent: #fa8c16;
+    --bg: #fefcf9;
+    --card: #ffffff;
+    --text: #2c1810;
+    --text-secondary: #7a5c4f;
+    --border: #f0ddd0;
+    --shadow: 0 2px 12px rgba(180,120,80,0.08);
+    --radius: 14px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 720px; margin: 0 auto; padding: 0 16px 40px; }
+
+  /* Hero */
+  .hero {
+    background: linear-gradient(135deg, #d4380d 0%, #fa8c16 100%);
+    color: #fff;
+    padding: 48px 20px 36px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+  }
+  .hero h1 { font-size: 28px; font-weight: 700; margin-bottom: 8px; position: relative; }
+  .hero .subtitle { font-size: 14px; opacity: 0.9; position: relative; }
+  .hero .tags { margin-top: 16px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; position: relative; }
+  .hero .tag {
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(4px);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+  }
+
+  /* Overview Cards */
+  .overview { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: -20px; position: relative; z-index: 1; }
+  .ov-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+  .ov-card .label { font-size: 11px; color: var(--text-secondary); margin-bottom: 4px; }
+  .ov-card .value { font-size: 20px; font-weight: 700; color: var(--primary); }
+
+  /* Section */
+  .section { margin-top: 28px; }
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    padding-left: 12px;
+    border-left: 4px solid var(--primary);
+  }
+
+  /* Day Card */
+  .day-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .day-header {
+    padding: 14px 16px;
+    font-weight: 700;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+  }
+  .day-header:hover { background: var(--primary-light); }
+  .day-header .day-num {
+    background: var(--primary);
+    color: #fff;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; flex-shrink: 0;
+  }
+  .day-header .day-area { color: var(--text-secondary); font-weight: 400; font-size: 13px; margin-left: auto; }
+  .day-header .arrow { transition: transform 0.3s; font-size: 12px; color: var(--text-secondary); }
+  .day-header.open .arrow { transform: rotate(180deg); }
+  .day-body { padding: 0 16px 14px; display: none; }
+  .day-body.show { display: block; }
+
+  /* Timeline */
+  .timeline { position: relative; padding-left: 20px; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 5px; top: 6px; bottom: 6px;
+    width: 2px;
+    background: var(--border);
+  }
+  .t-item { position: relative; padding: 6px 0 6px 16px; }
+  .t-item::before {
+    content: '';
+    position: absolute;
+    left: -19px; top: 12px;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px var(--border);
+  }
+  .t-item.transport::before { background: #1890ff; }
+  .t-item.walk::before { background: #52c41a; }
+  .t-item .t-time { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+  .t-item .t-content { font-size: 14px; }
+  .t-item .t-shop { font-weight: 700; color: var(--primary); }
+  .t-item .t-price { font-size: 12px; color: var(--accent); float: right; }
+
+  /* Tips */
+  .tips {
+    background: var(--primary-light);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+  .tips strong { color: var(--primary); }
+
+  /* Table */
+  .info-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+  .info-table th, .info-table td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+  .info-table th { color: var(--text-secondary); font-weight: 500; font-size: 12px; }
+  .info-table td:last-child { text-align: right; color: var(--accent); font-weight: 600; }
+
+  /* Dish List */
+  .dish-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .dish-item {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 10px 12px;
+    box-shadow: var(--shadow);
+  }
+  .dish-item .dish-name { font-weight: 700; font-size: 14px; }
+  .dish-item .dish-type { font-size: 11px; color: var(--text-secondary); }
+  .dish-item .dish-shop { font-size: 12px; color: var(--primary); margin-top: 2px; }
+  .dish-item .dish-day { font-size: 11px; color: var(--accent); }
+
+  /* Avoid List */
+  .avoid-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .avoid-item { border-radius: 10px; padding: 10px 12px; font-size: 13px; }
+  .avoid-bad { background: #fff1f0; }
+  .avoid-good { background: #f6ffed; }
+  .avoid-bad .label { color: #cf1322; font-weight: 600; }
+  .avoid-good .label { color: #389e0d; font-weight: 600; }
+
+  /* Gift */
+  .gift-list { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 4px; }
+  .gift-card {
+    background: var(--card);
+    border-radius: 10px;
+    padding: 12px 14px;
+    box-shadow: var(--shadow);
+    min-width: 140px;
+    flex-shrink: 0;
+  }
+  .gift-card .g-name { font-weight: 700; font-size: 14px; }
+  .gift-card .g-shop { font-size: 12px; color: var(--primary); }
+  .gift-card .g-price { font-size: 12px; color: var(--accent); margin-top: 4px; }
+
+  /* Budget Bar */
+  .budget-bar { margin-top: 8px; }
+  .b-row { display: flex; align-items: center; margin-bottom: 6px; font-size: 13px; }
+  .b-label { width: 70px; color: var(--text-secondary); flex-shrink: 0; }
+  .b-bar { flex: 1; height: 20px; background: #f5ebe4; border-radius: 10px; overflow: hidden; margin: 0 10px; }
+  .b-fill { height: 100%; border-radius: 10px; display: flex; align-items: center; padding-left: 8px; color: #fff; font-size: 11px; font-weight: 600; }
+  .b-value { width: 60px; text-align: right; font-weight: 600; color: var(--text); }
+
+  /* Footer */
+  .footer { text-align: center; padding: 30px 0 20px; font-size: 12px; color: var(--text-secondary); }
+
+  /* Responsive */
+  @media (max-width: 480px) {
+    .hero h1 { font-size: 22px; }
+    .overview { grid-template-columns: 1fr 1fr; }
+    .dish-grid { grid-template-columns: 1fr; }
+    .avoid-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Share hint */
+  .share-hint {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--primary);
+    color: #fff;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 13px;
+    box-shadow: 0 4px 16px rgba(212,56,13,0.3);
+    z-index: 100;
+    display: none;
+    animation: fadeInUp 0.3s;
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <h1>🍜 顺德4天美食攻略</h1>
+  <div class="subtitle">本地人路线 · 周四至周日 · 深圳出发</div>
+  <div class="tags">
+    <span class="tag">🚫 不踩网红坑</span>
+    <span class="tag">🎯 17道零重复</span>
+    <span class="tag">💰 约1400元</span>
+    <span class="tag">🚄 深圳出发</span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- Overview -->
+<div class="overview">
+  <div class="ov-card"><div class="label">行程天数</div><div class="value">4天3夜</div></div>
+  <div class="ov-card"><div class="label">特色菜品</div><div class="value">17道</div></div>
+  <div class="ov-card"><div class="label">打卡店铺</div><div class="value">14家</div></div>
+  <div class="ov-card"><div class="label">总预算</div><div class="value">≈1400</div></div>
+</div>
+
+<!-- Day 1 -->
+<div class="section">
+  <div class="section-title">📅 每日行程</div>
+
+  <div class="day-card">
+    <div class="day-header open" onclick="toggleDay(this)">
+      <span class="day-num">1</span>
+      周四 · 大良老城开味
+      <span class="day-area">≈195元</span>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="day-body show">
+      <div class="timeline">
+        <div class="t-item transport">
+          <div class="t-time">9:00</div>
+          <div class="t-content">深圳北 → 广州南（高铁36分钟）→ 顺德站（城际14分钟）<span class="t-price">≈105元</span></div>
+        </div>
+        <div class="t-item">
+          <div class="t-time">11:30</div>
+          <div class="t-content"><span class="t-shop">顺德人家食府</span> — 虾饺皇+凤爪+肠粉+菊普<span class="t-price">≈60元</span></div>
+        </div>
+        <div class="t-item walk">
+          <div class="t-time">13:30</div>
+          <div class="t-content">清晖园散步消食（岭南四大名园之一）<span class="t-price">15元</span></div>
+        </div>
+        <div class="t-item">
+          <div class="t-time">15:00</div>
+          <div class="t-content"><span class="t-shop">民信老铺</span> — 原炖双皮奶 · <span class="t-shop">欢记牛乳牛奶</span> — 水牛奶+手信<span class="t-price">≈30元</span></div>
+        </div>
+        <div class="t-item">
+          <div class="t-time">18:00</div>
+          <div class="t-content"><span class="t-shop">聚福山庄</span> — 顺德鱼生（半份）+ 菊花拆鱼羹<span class="t-price">≈90元</span></div>
+        </div>
+        <div class="t-item walk">
+          <div class="t-time">20:30</div>
+          <div class="t-content">华盖路步行街散步</div>
+        </div>
+      </div>
+      <div class="tips">
+        <strong>Tips：</strong>周四到避开周末人流，早茶不排队 · 聚福鱼生1人点半份 · 欢记在金榜上街深处，别被华盖路仿冒店截走
+      </div>
+    </div>
+  </div>
+
+  <!-- Day 2 -->
+  <div class="day-card">
+    <div class="day-header" onclick="toggleDay(this)">
+      <span class="day-num">2</span>
+      周五 · 容桂硬核横扫
+      <span class="day-area">≈265元</span>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="day-body">
+      <div class="timeline">
+        <div class="t-item">
+          <div class="t-time">7:30</div>
+          <div class="t-content">容桂早市茶楼 — 一盅两件简版早茶<span class="t-price">≈35元</span></div>
+        </div>
+        <div class="t-item">
+          <div class="t-time">11:00</div>
+          <div class="t-content"><span class="t-shop">松记食店</span> — 清水打边炉（竹肠+猪展肉+水蛇片+手工肉丸）<span class="t-price">≈120元</span></div>
+        </div>
+        <div class="t-item walk">
+          <div class="t-time">14:00</div>
+          <div class="t-content">容桂老街消食</div>
+        </div>
+        <div class="t-item">
+          <div class="t-time">15:00</div>
+          <div class="t-content"><span class="t-shop">红星光发煲仔饭</span> — 黄鳝煲仔饭（锅巴是灵魂）<span class="t-price">≈50元</span></div>
+        </div>
+        <div class="t-item">
+          <div class="t-time">17:00</div>
+          <div class="t-content"><span class="t-shop">大头华烧鹅</span> — 1/4只烧鹅腿<span class="t-price">≈30元</span></div>
+        </div>
+        <div class="t-item">
+          <div class="t-time">18:30</div>
+          <div class="t-content"><span class="t-shop">根哥农庄</span> — 烧鸡+蜜汁烧排骨<span class="t-price">≈65元</span></div>
+        </div>
+        <div class="t-item">
+          <div class="t-time">21:30</div>
+          <div class="t-content"><span class="t-shop">英姑猪杂粥</span> — 宵夜<span class="t-price">≈30元</span></div>
+        </div>
+      </div>
+      <div class="tips">
+        <strong>松记攻略：</strong>1人去会被安排拼桌 · 下菜<strong>必须</strong>听服务员指挥：贝类→鱼→肉→菜 · 清水锅是信仰
+      </div>
+    </div>
+  </div>
+
+  <!-- Day 3 -->
+  <div class="day-card">
+    <div class="day-header" onclick="toggleDay(this)">
+      <span class="day-num">3</span>
+      周六 · 伦教陈村寻根 → 大良品鲜
+      <span class="day-area">≈195元</span>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="day-body">
+      <div class="timeline">
+        <div class="t-item">
+          <div class="t-time">7:30</div>
+          <div class="t-content"><span class="t-shop">黄但记</span>（陈村）— XO酱炒陈村粉 + 原汤陈村粉<span class="t-price">≈45元</span></div>
+        </div>
+        <div class="t-item">
+          <div class="t-time">9:30</div>
+          <div class="t-content"><span class="t-shop">欢姐伦教糕</span>（伦教）— 白糖伦教糕现吃+打包手信<span class="t-price">≈10元</span></div>
+        </div>
+        <div class="t-item">
+          <div class="t-time">11:30</div>
+          <div class="t-content"><span class="t-shop">猪肉婆私房菜</span>（容桂）— 银杏猪肚汤 + 私房招牌菜<span class="t-price">≈130元</span></div>
+        </div>
+        <div class="t-item walk">
+          <div class="t-time">14:30</div>
+          <div class="t-content">回大良，金榜上街再逛</div>
+        </div>
+        <div class="t-item">
+          <div class="t-time">16:00</div>
+          <div class="t-content"><span class="t-shop">仁信老铺</span> — 红豆双皮奶（和民信对比着吃）<span class="t-price">≈15元</span></div>
+        </div>
+        <div class="t-item">
+          <div class="t-time">18:30</div>
+          <div class="t-content"><span class="t-shop">了能馆</span> — 煎焗鱼嘴 + 大良炒牛奶<span class="t-price">≈100元</span></div>
+        </div>
+      </div>
+      <div class="tips">
+        <strong>民信 vs 仁信：</strong>本地人各有阵营，民信偏绵密，仁信偏清爽，自己吃了定 · 周六人多，7:30前出门
+      </div>
+    </div>
+  </div>
+
+  <!-- Day 4 -->
+  <div class="day-card">
+    <div class="day-header" onclick="toggleDay(this)">
+      <span class="day-num">4</span>
+      周日 · 均安杏坛收官 → 返程
+      <span class="day-area">≈215元</span>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="day-body">
+      <div class="timeline">
+        <div class="t-item">
+          <div class="t-time">8:00</div>
+          <div class="t-content">大良最后一顿早茶 — 换一家茶楼尝鲜<span class="t-price">≈40元</span></div>
+        </div>
+        <div class="t-item">
+          <div class="t-time">10:30</div>
+          <div class="t-content"><span class="t-shop">大自然醉鹅</span>（均安）— 醉鹅一锅，锅盖一开酒香扑鼻<span class="t-price">≈90元</span></div>
+        </div>
+        <div class="t-item">
+          <div class="t-time">13:00</div>
+          <div class="t-content"><span class="t-shop">花花美食</span>（杏坛）— 卜卜白贝 + 炒米粉<span class="t-price">≈55元</span></div>
+        </div>
+        <div class="t-item">
+          <div class="t-time">15:00</div>
+          <div class="t-content">🎁 买手信：欢记牛乳片 + 欢姐伦教糕 + 民信双皮奶奶粉<span class="t-price">≈30元</span></div>
+        </div>
+        <div class="t-item transport">
+          <div class="t-time">16:30</div>
+          <div class="t-content">顺德站 → 广州南 → 深圳北<span class="t-price">≈105元</span></div>
+        </div>
+        <div class="t-item walk">
+          <div class="t-time">19:30</div>
+          <div class="t-content">🏠 到达深圳</div>
+        </div>
+      </div>
+      <div class="tips">
+        <strong>Tips：</strong>均安/杏坛较远，建议打车（约40-50元）· 醉鹅和卜卜白贝都是本次首次出现，零重复
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Budget -->
+<div class="section">
+  <div class="section-title">💰 预算明细</div>
+  <div class="budget-bar">
+    <div class="b-row">
+      <span class="b-label">餐饮</span>
+      <div class="b-bar"><div class="b-fill" style="width:62%;background:var(--primary);">4天</div></div>
+      <span class="b-value">≈870元</span>
+    </div>
+    <div class="b-row">
+      <span class="b-label">住宿</span>
+      <div class="b-bar"><div class="b-fill" style="width:26%;background:var(--accent);">3晚</div></div>
+      <span class="b-value">≈300元</span>
+    </div>
+    <div class="b-row">
+      <span class="b-label">交通</span>
+      <div class="b-bar"><div class="b-fill" style="width:18%;background:#1890ff;">含往返</div></div>
+      <span class="b-value">≈240元</span>
+    </div>
+    <div class="b-row" style="border-top:1px solid var(--border);padding-top:8px;margin-top:4px;">
+      <span class="b-label" style="font-weight:700;">合计</span>
+      <div class="b-bar" style="background:transparent;"></div>
+      <span class="b-value" style="color:var(--primary);font-size:16px;">≈1400元</span>
+    </div>
+  </div>
+</div>
+
+<!-- Dishes -->
+<div class="section">
+  <div class="section-title">🍱 17道特色菜品（零重复）</div>
+  <div class="dish-grid">
+    <div class="dish-item"><div class="dish-name">虾饺皇</div><div class="dish-type">早茶点心</div><div class="dish-shop">顺德人家</div><div class="dish-day">📍 周四</div></div>
+    <div class="dish-item"><div class="dish-name">原炖双皮奶</div><div class="dish-type">炖品</div><div class="dish-shop">民信老铺</div><div class="dish-day">📍 周四</div></div>
+    <div class="dish-item"><div class="dish-name">顺德鱼生</div><div class="dish-type">生食</div><div class="dish-shop">聚福山庄</div><div class="dish-day">📍 周四</div></div>
+    <div class="dish-item"><div class="dish-name">菊花拆鱼羹</div><div class="dish-type">羹汤</div><div class="dish-shop">聚福山庄</div><div class="dish-day">📍 周四</div></div>
+    <div class="dish-item"><div class="dish-name">清水打边炉</div><div class="dish-type">清水锅</div><div class="dish-shop">松记食店</div><div class="dish-day">📍 周五</div></div>
+    <div class="dish-item"><div class="dish-name">黄鳝煲仔饭</div><div class="dish-type">煲仔</div><div class="dish-shop">红星光发</div><div class="dish-day">📍 周五</div></div>
+    <div class="dish-item"><div class="dish-name">烧鹅</div><div class="dish-type">烧腊</div><div class="dish-shop">大头华</div><div class="dish-day">📍 周五</div></div>
+    <div class="dish-item"><div class="dish-name">烧鸡+烧排骨</div><div class="dish-type">炭烧</div><div class="dish-shop">根哥农庄</div><div class="dish-day">📍 周五</div></div>
+    <div class="dish-item"><div class="dish-name">猪杂粥</div><div class="dish-type">生滚粥</div><div class="dish-shop">英姑</div><div class="dish-day">📍 周五</div></div>
+    <div class="dish-item"><div class="dish-name">陈村粉</div><div class="dish-type">蒸粉</div><div class="dish-shop">黄但记</div><div class="dish-day">📍 周六</div></div>
+    <div class="dish-item"><div class="dish-name">伦教糕</div><div class="dish-type">发酵糕点</div><div class="dish-shop">欢姐</div><div class="dish-day">📍 周六</div></div>
+    <div class="dish-item"><div class="dish-name">银杏猪肚汤</div><div class="dish-type">煲汤</div><div class="dish-shop">猪肉婆</div><div class="dish-day">📍 周六</div></div>
+    <div class="dish-item"><div class="dish-name">红豆双皮奶</div><div class="dish-type">炖品（vs民信对比）</div><div class="dish-shop">仁信老铺</div><div class="dish-day">📍 周六</div></div>
+    <div class="dish-item"><div class="dish-name">煎焗鱼嘴</div><div class="dish-type">煎焗</div><div class="dish-shop">了能馆</div><div class="dish-day">📍 周六</div></div>
+    <div class="dish-item"><div class="dish-name">大良炒牛奶</div><div class="dish-type">炒制</div><div class="dish-shop">了能馆</div><div class="dish-day">📍 周六</div></div>
+    <div class="dish-item"><div class="dish-name">醉鹅</div><div class="dish-type">酒烹</div><div class="dish-shop">大自然醉鹅</div><div class="dish-day">📍 周日</div></div>
+    <div class="dish-item"><div class="dish-name">卜卜白贝</div><div class="dish-type">白灼</div><div class="dish-shop">花花美食</div><div class="dish-day">📍 周日</div></div>
+  </div>
+</div>
+
+<!-- Transport -->
+<div class="section">
+  <div class="section-title">🚗 交通指南</div>
+  <table class="info-table">
+    <tr><th>步骤</th><th>方式</th><th>时间</th><th>花费</th></tr>
+    <tr><td>深圳北 → 广州南</td><td>高铁</td><td>约36分钟</td><td>≈75元</td></tr>
+    <tr><td>广州南 → 顺德站</td><td>城际</td><td>约14分钟</td><td>≈15元</td></tr>
+    <tr><td>到站 → 大良酒店</td><td>打车</td><td>约15分钟</td><td>≈20元</td></tr>
+  </table>
+  <div class="tips" style="margin-top:10px;">
+    <strong>💡</strong> 建议买深圳北→容桂站直达票（如有时段），省去广州南换乘<br>
+    区内公交2-4元，打车起步10元，住大良步行可覆盖60%的店
+  </div>
+</div>
+
+<!-- Accommodation -->
+<div class="section">
+  <div class="section-title">🏨 住宿推荐</div>
+  <div class="tips">
+    <strong>首选大良地铁站附近</strong>：美食最集中，步行可达多数店铺<br>
+    · 碧之云酒店（华侨城店）<br>
+    · 大良智选假日<br>
+    · 美团/携程搜"大良地铁站"，民宿 80-120元/晚
+  </div>
+</div>
+
+<!-- Culture -->
+<div class="section">
+  <div class="section-title">🎯 饮食文化须知</div>
+  <div class="tips">
+    <strong>三大核心技法（本次全覆盖）：</strong><br>
+    1️⃣ 桑拿蒸 — 恒温锁鲜 → 聚福山庄<br>
+    2️⃣ 拆鱼羹 — 刀工解构 → 聚福鱼生+拆鱼羹<br>
+    3️⃣ 牛奶炒 — 乳化控制 → 了能馆炒牛奶<br><br>
+    <strong>就餐Tips：</strong><br>
+    · 早茶要配壶茶，不只为吃点心<br>
+    · 清水锅下菜听服务员指挥<br>
+    · 鱼生配菜全拌在一起吃<br>
+    · 说"唔该"（谢谢）更接地气<br>
+    · 部分老字号只收现金，备200元零钱<br>
+    · 周末早茶尽量7:30前到店
+  </div>
+</div>
+
+<!-- Avoid -->
+<div class="section">
+  <div class="section-title">❌ 避坑清单</div>
+  <div class="avoid-grid">
+    <div class="avoid-item avoid-bad"><span class="label">❌ 避开</span><br>华盖路景区溢价餐厅</div>
+    <div class="avoid-item avoid-good"><span class="label">✅ 替代</span><br>往巷子里走，找金榜上街</div>
+    <div class="avoid-item avoid-bad"><span class="label">❌ 避开</span><br>带"顺德"字样的连锁店</div>
+    <div class="avoid-item avoid-good"><span class="label">✅ 替代</span><br>本地人开的单店</div>
+    <div class="avoid-item avoid-bad"><span class="label">❌ 避开</span><br>网红打卡甜品店</div>
+    <div class="avoid-item avoid-good"><span class="label">✅ 替代</span><br>民信 / 仁信 / 欢记</div>
+    <div class="avoid-item avoid-bad"><span class="label">❌ 避开</span><br>景区门口的鱼生店</div>
+    <div class="avoid-item avoid-good"><span class="label">✅ 替代</span><br>聚福 / 松记 / 东荣</div>
+  </div>
+</div>
+
+<!-- Gifts -->
+<div class="section">
+  <div class="section-title">🎁 手信推荐</div>
+  <div class="gift-list">
+    <div class="gift-card"><div class="g-name">🥛 牛乳片</div><div class="g-shop">欢记牛乳牛奶</div><div class="g-price">≈15-20元/包</div></div>
+    <div class="gift-card"><div class="g-name">🍰 伦教糕</div><div class="g-shop">欢姐伦教糕</div><div class="g-price">≈10元</div></div>
+    <div class="gift-card"><div class="g-name">🍮 双皮奶奶粉</div><div class="g-shop">民信老铺</div><div class="g-price">≈25元/盒</div></div>
+    <div class="gift-card"><div class="g-name">🍜 陈村粉干</div><div class="g-shop">黄但记</div><div class="g-price">≈20元/包</div></div>
+  </div>
+</div>
+
+<div class="footer">顺德不会让你失望，好好吃 🍽️</div>
+
+</div>
+
+<div class="share-hint" id="shareHint">长按链接即可分享到微信</div>
+
+<script>
+function toggleDay(header) {
+  const body = header.nextElementSibling;
+  const isOpen = header.classList.contains('open');
+  header.classList.toggle('open', !isOpen);
+  body.classList.toggle('show', !isOpen);
+}
+</script>
+</body>
+</html>
